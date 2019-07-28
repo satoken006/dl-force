@@ -5,9 +5,10 @@ from bs4 import BeautifulSoup
 
 from const import MEMBERS, MEMBERS_EN
 from RepositoryParser import RepositoryParser
-
+from JSONWriter import JSONWriter
 
 parser = RepositoryParser()
+writer = JSONWriter()
 RANGE = 194
 
 for i in range(1, RANGE + 1):
@@ -28,3 +29,5 @@ repositoryJSON = parser.getResult()
 
 print("result: ")
 print(repositoryJSON)
+
+JSONWriter.export(repositoryJSON, "output.json")
