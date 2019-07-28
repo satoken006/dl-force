@@ -10,8 +10,6 @@ from RepositoryParser import RepositoryParser
 parser = RepositoryParser()
 RANGE = 194
 
-edge_list = []
-
 for i in range(1, RANGE + 1):
     # Connect to the Web and get HTML
     try:
@@ -23,4 +21,10 @@ for i in range(1, RANGE + 1):
         continue
 
     soup = BeautifulSoup(html, "lxml")
-    parser.append_edge(soup, edge_list);
+    parser.append_edge(soup);
+
+
+repositoryJSON = parser.getResult()
+
+print("result: ")
+print(repositoryJSON)
