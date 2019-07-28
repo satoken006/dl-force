@@ -4,7 +4,8 @@ from const import MEMBERS, MEMBERS_EN
 
 class RepositoryParser:
     def __init__(self):
-        print()
+        self.authorID = 0
+        self.authors = []
 
     # Get author list from HTML
     def get_author_list(self, soup):
@@ -33,6 +34,25 @@ class RepositoryParser:
 
         if main_author == None:
             return
+        else:
+            author_exists = False
+
+            for i in range(len(self.authors)):
+                # print(self.authors[i])
+                if main_author in self.authors[i].values():
+                    self.authors[i]["r"] += 1
+                    author_exists = True
+
+            if not author_exists:
+                author = {
+                    "id": self.authorID, 
+                    "label": main_author,
+                    "r": 1
+                }
+                self.authors.append(author)
+                self.authorID += 1
+
+        print(self.authors)
 
         for i in range(1, len(author_list)):
             co_author = author_list[i].get_text(" ", strip=True)
