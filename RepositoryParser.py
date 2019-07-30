@@ -27,7 +27,7 @@ class RepositoryParser:
 
         return ret_author
 
-    def append_edge(self, _soup, _list):
+    def append_edge(self, _soup):
         author_list = self.get_author_list(_soup)
         main_author = author_list[0].get_text(" ", strip=True)
         main_author = self.get_nickname_from_hashmap(main_author)
@@ -62,4 +62,13 @@ class RepositoryParser:
                 return
 
             print(co_author + " --> " + main_author)
-            _list.append([co_author, main_author])
+            # _list.append([co_author, main_author])
+
+    # Get result of parsing
+    def getResult(self):
+        resultJSON = {
+            "nodes": self.authors
+        }
+
+        return resultJSON
+
