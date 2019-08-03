@@ -12,8 +12,8 @@
 </style>
 
 <script type="text/javascript">
-    var width = 800;
-    var height = 600;
+    var width = 1000;
+    var height = 1000;
 
     // setup svg
     var svg = d3.select("body")
@@ -25,26 +25,27 @@
     // label: firstname
     // r: get times that an author has published papers
     var nodes = [];
-    
-    $.ajaxSetup({async: false});
-    $.getJSON("output.json", function (data) {
-        nodes = data["nodes"];
-    });
 
     // Define data of links, the relationship of nodes
     // source: co-autor
     // target: main author
     // weight: times to have written paper together
     var links = [];
+    
+    $.ajaxSetup({async: false});
+    $.getJSON("output_tmp.json", function (data) {
+        nodes = data["nodes"];
+        links = data["links"];
+    });
 
     var force = d3.layout.force()
         .nodes(nodes)
         .links(links)
         .size([width, height])
-        .distance(140)
+        .distance(100)
         .friction(0.9)
-        .charge(-300)
-        .gravity(0.1)
+        .charge(-1000)
+        .gravity(0.05)
         .start();
 
     var link = svg.selectAll("line")
@@ -52,8 +53,8 @@
         .enter()
         .append("line")
         .style({
-            stroke: "#ccc",
-            "stroke-width": function(data){ return data.weight; }
+            stroke: function(data){ return "rgb(" + (data.weight - 1) * 64 + ", 0, 255)"; },
+            "stroke-width": function(data){ return data.weight * 2; }
         });
 
     var node = svg.selectAll("circle")
@@ -61,7 +62,7 @@
         .enter()
         .append("circle")
         .attr({
-            r: function(data) { return data.r * 5; }
+            r: function(data) { return data.r * 4; }
         })
         .style({
             fill: "orange"
@@ -75,7 +76,7 @@
         .attr({
             "text-anchor":"middle",
             "fill":"black",
-            "font-size": "9px"
+            "font-size": function(data){ return data.r * 2 + 9; }
         })
         .text(function(data) { return data.label; });
 
