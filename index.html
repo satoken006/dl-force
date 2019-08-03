@@ -33,7 +33,7 @@
     var links = [];
     
     $.ajaxSetup({async: false});
-    $.getJSON("output_tmp.json", function (data) {
+    $.getJSON("output.json", function (data) {
         nodes = data["nodes"];
         links = data["links"];
     });

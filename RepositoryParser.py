@@ -4,13 +4,11 @@ from const import MEMBERS, MEMBERS_EN
 
 class RepositoryParser:
     def __init__(self):
-        self.authorID = 0
         self.authors = []
         self.joint_works = []
-
+        self.authorID = 0
         self.main_author_id = -1;
         self.co_author_id = -1;
-
         self.isSkipMode = False
 
     # Get author list from HTML
@@ -71,48 +69,43 @@ class RepositoryParser:
             self.authors.append(author_obj)
             self.authorID += 1
 
-    # TODO: rename function
-    # TODO: split into several functions
-    ### functionalize the part of "adding an author"
-    def append_edge(self, _soup):
+    # scrape infomation of authors and add them into authors list
+    # TODO: exclude theses before scraping authors
+    def add_authors_and_edges(self, _soup):
         author_list = self.get_author_list(_soup)
 
         self.add_author(author_list[0], True)
-
         if self.isSkipMode:
             return
 
-        # print("author list:")
-        # print(author_list)
-
         for i in range(1, len(author_list)):
             self.add_author(author_list[i], False);
-
             if self.isSkipMode:
                 return
 
-            print(str(self.co_author_id) +"-->"+ str(self.main_author_id))
+            self.add_edge()
 
-            ### add a edge between main author and co_author ###
-            joint_works_exists = False
+    # add a edge between main author and co_author
+    def add_edge(self):
+        print(str(self.co_author_id) +"-->"+ str(self.main_author_id))
+        joint_works_exists = False
 
-            for i in range(len(self.joint_works)):
-                values = list(self.joint_works[i].values())
+        for i in range(len(self.joint_works)):
+            values = list(self.joint_works[i].values())
 
-                if (self.main_author_id == values[0] and self.co_author_id == values[1]) or (self.main_author_id == values[1] and self.co_author_id == values[0]):
-                    # weight +1 at current LINK
-                    self.joint_works[i]["weight"] += 1
-                    joint_works_exists = True
-                    break
+            if (self.main_author_id == values[0] and self.co_author_id == values[1]) or (self.main_author_id == values[1] and self.co_author_id == values[0]):
+                self.joint_works[i]["weight"] += 1
+                joint_works_exists = True
+                break
 
-            if not joint_works_exists:
-                # add new element LINK
-                joint_work = {
-                    "source": self.co_author_id,
-                    "target": self.main_author_id,
-                    "weight": 1
-                }
-                self.joint_works.append(joint_work)
+        if not joint_works_exists:
+            # add new element LINK
+            joint_work = {
+                "source": self.co_author_id,
+                "target": self.main_author_id,
+                "weight": 1
+            }
+            self.joint_works.append(joint_work)
 
     # Get result of parsing
     def getResult(self):
