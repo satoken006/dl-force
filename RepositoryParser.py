@@ -45,7 +45,6 @@ class RepositoryParser:
         author_name = _elem_author.get_text(" ", strip=True)
         author_name = self.get_firstname_from_hashmap(author_name)
         author_id = -1;
-        author_exists = False
         self.isSkipMode = False
 
         if author_name == None:
@@ -58,20 +57,17 @@ class RepositoryParser:
                     self.authors[i]["r"] += 1
                 
                 self.update_author_id(_is_main_author, self.authors[i]["id"])
+                return
 
-                author_exists = True
-                break
-
-        if not author_exists:
-            self.update_author_id(_is_main_author, self.authorID)
-            # Add a new element of author
-            author_obj = {
-                "id": self.authorID, 
-                "label": author_name,
-                "r": 1
-            }
-            self.authors.append(author_obj)
-            self.authorID += 1
+        self.update_author_id(_is_main_author, self.authorID)
+        # Add a new element of author
+        author_obj = {
+            "id": self.authorID, 
+            "label": author_name,
+            "r": 1
+        }
+        self.authors.append(author_obj)
+        self.authorID += 1
 
     # Scrape infomation of authors and add them into authors list
     ### TODO: exclude theses before scraping authors ###
@@ -92,24 +88,21 @@ class RepositoryParser:
     # Add a edge between main author and co author
     def add_edge(self):
         print(str(self.co_author_id) +"-->"+ str(self.main_author_id))
-        joint_works_exists = False
 
         for i in range(len(self.joint_works)):
             values = list(self.joint_works[i].values())
 
             if (self.main_author_id == values[0] and self.co_author_id == values[1]) or (self.main_author_id == values[1] and self.co_author_id == values[0]):
                 self.joint_works[i]["weight"] += 1
-                joint_works_exists = True
-                break
+                return
 
-        if not joint_works_exists:
-            # Add a new element of edge
-            joint_work = {
-                "source": self.co_author_id,
-                "target": self.main_author_id,
-                "weight": 1
-            }
-            self.joint_works.append(joint_work)
+        # Add a new element of edge
+        joint_work = {
+            "source": self.co_author_id,
+            "target": self.main_author_id,
+            "weight": 1
+        }
+        self.joint_works.append(joint_work)
 
     # Get result of parsing
     def getResult(self):
