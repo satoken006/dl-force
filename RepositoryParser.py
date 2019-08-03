@@ -21,7 +21,7 @@ class RepositoryParser:
         
         return a_list
 
-    def get_nickname_from_hashmap(self, _author):
+    def get_firstname_from_hashmap(self, _author):
         ret_author = None
 
         if _author in MEMBERS.keys():
@@ -31,9 +31,10 @@ class RepositoryParser:
 
         return ret_author
 
+    
     def add_author(self, _elem_author, _is_main_author):
         author_name = _elem_author.get_text(" ", strip=True)
-        author_name = self.get_nickname_from_hashmap(author_name)
+        author_name = self.get_firstname_from_hashmap(author_name)
         author_id = -1;
         author_exists = False
         self.isSkipMode = False
