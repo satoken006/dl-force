@@ -21,6 +21,7 @@ class RepositoryParser:
         
         return a_list
 
+    # Convert crawled full name into firstname
     def get_firstname_from_hashmap(self, _author):
         ret_author = None
 
@@ -31,7 +32,15 @@ class RepositoryParser:
 
         return ret_author
 
-    
+    # When scraping information of main author, update self.main_author_id
+    # When not doing, update self.co_author_id
+    def update_author_id(self, _is_main_author, _author_id):
+        if _is_main_author:
+            self.main_author_id = _author_id
+        else:
+            self.co_author_id = _author_id
+
+    # Scrape information of an author add it into self.authors
     def add_author(self, _elem_author, _is_main_author):
         author_name = _elem_author.get_text(" ", strip=True)
         author_name = self.get_firstname_from_hashmap(author_name)
@@ -48,20 +57,14 @@ class RepositoryParser:
                 if _is_main_author:
                     self.authors[i]["r"] += 1
                 
-                if _is_main_author:
-                    self.main_author_id = self.authors[i]["id"]
-                else:
-                    self.co_author_id = self.authors[i]["id"]
+                self.update_author_id(_is_main_author, self.authors[i]["id"])
 
                 author_exists = True
                 break
 
         if not author_exists:
-            if _is_main_author:
-                self.main_author_id = self.authorID
-            else:
-                self.co_author_id = self.authorID
-
+            self.update_author_id(_is_main_author, self.authorID)
+            # Add a new element of author
             author_obj = {
                 "id": self.authorID, 
                 "label": author_name,
@@ -70,8 +73,8 @@ class RepositoryParser:
             self.authors.append(author_obj)
             self.authorID += 1
 
-    # scrape infomation of authors and add them into authors list
-    # TODO: exclude theses before scraping authors
+    # Scrape infomation of authors and add them into authors list
+    ### TODO: exclude theses before scraping authors ###
     def add_authors_and_edges(self, _soup):
         author_list = self.get_author_list(_soup)
 
@@ -86,7 +89,7 @@ class RepositoryParser:
 
             self.add_edge()
 
-    # add a edge between main author and co_author
+    # Add a edge between main author and co author
     def add_edge(self):
         print(str(self.co_author_id) +"-->"+ str(self.main_author_id))
         joint_works_exists = False
@@ -100,7 +103,7 @@ class RepositoryParser:
                 break
 
         if not joint_works_exists:
-            # add new element LINK
+            # Add a new element of edge
             joint_work = {
                 "source": self.co_author_id,
                 "target": self.main_author_id,
