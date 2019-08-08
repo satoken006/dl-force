@@ -10,6 +10,8 @@ from JSONWriter import JSONWriter
 parser = RepositoryParser()
 writer = JSONWriter()
 RANGE = 194
+### For test run ###
+# RANGE = 50
 
 for i in range(1, RANGE + 1):
     # Connect to the Web and get HTML
@@ -22,7 +24,7 @@ for i in range(1, RANGE + 1):
         continue
 
     soup = BeautifulSoup(html, "lxml")
-    parser.append_edge(soup);
+    parser.add_authors_and_edges(soup)
 
 
 repositoryJSON = parser.getResult()

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>d3test</title>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+<style type="text/css">
+</style>
+
+<script type="text/javascript">
+    var width = 1000;
+    var height = 1000;
+
+    // setup svg
+    var svg = d3.select("body")
+        .append("svg")
+        .attr({width:width, height:height});
+    
+    $.ajaxSetup({async: false});
+    $.getJSON("output.json", function (data) {
+        nodes = data["nodes"];
+        links = data["links"];
+    });
+
+    var force = d3.layout.force()
+        .nodes(nodes)
+        .links(links)
+        .size([width, height])
+        .distance(100)
+        .friction(0.9)
+        .charge(-1000)
+        .gravity(0.05)
+        .start();
+
+    // Define data of links, the relationship of nodes
+    // source: co-autor
+    // target: main author
+    // weight: times to have written paper together
+    var link = svg.selectAll("line")
+        .data(links)
+        .enter()
+        .append("line")
+        .style({
+            stroke: function(data){ return "rgb(" + (data.weight - 1) * 64 + ", 0, 255)"; },
+            "stroke-width": function(data){ return data.weight * 2; }
+        });
+
+    // Define data of nodes
+    // id: incremental
+    // label: firstname
+    // r: get times that an author has published papers
+    var node = svg.selectAll("circle")
+        .data(nodes)
+        .enter()
+        .append("circle")
+        .attr({
+            r: function(data) { return data.r * 4; }
+        })
+        .style({
+            fill: "orange"
+        })
+        .call(force.drag);
+
+    var label = svg.selectAll('text')
+        .data(nodes)
+        .enter()
+        .append('text')
+        .attr({
+            "text-anchor":"middle",
+            "fill":"black",
+            "font-size": function(data){ return data.r * 2 + 9; }
+        })
+        .text(function(data) { return data.label; });
+
+    force.on("tick", function() {
+        link.attr({
+            x1: function(data) { return data.source.x; },
+            y1: function(data) { return data.source.y; },
+            x2: function(data) { return data.target.x; },
+            y2: function(data) { return data.target.y; }
+        });
+        node.attr({
+            cx: function(data) { return data.x; },
+            cy: function(data) { return data.y; }
+        });
+        label.attr({
+            x: function(data) { return data.x; },
+            y: function(data) { return data.y; }
+        });
+    });
+
+
+</script>
+
+</body>
+</html>
