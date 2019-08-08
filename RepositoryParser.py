@@ -70,8 +70,11 @@ class RepositoryParser:
         self.authorID += 1
 
     # Scrape infomation of authors and add them into authors list
-    ### TODO: exclude theses before scraping authors ###
     def add_authors_and_edges(self, _soup):
+        categoryElem = _soup.find(class_ = "type_1A0-N")
+        if categoryElem.get_text() == "学位論文":
+            return
+
         author_list = self.get_author_list(_soup)
 
         self.add_author(author_list[0], True)
