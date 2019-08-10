@@ -17,7 +17,7 @@ for i in range(1, RANGE + 1):
     # Connect to the Web and get HTML
     try:
         html = urllib.request.urlopen("http://dl.nkmr-lab.org/papers/" + str(i))
-        print(str(i) + " / " + str(RANGE))
+        # print(str(i) + " / " + str(RANGE))
     except urllib.error.HTTPError as e:
         continue
     except NameError as e:
