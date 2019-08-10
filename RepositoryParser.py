@@ -55,6 +55,8 @@ class RepositoryParser:
             if author_name in self.authors[i].values():
                 if _is_main_author:
                     self.authors[i]["r"] += 1
+                else:
+                    self.authors[i]["stroke_width"] += 1
                 
                 self.update_author_id(_is_main_author, self.authors[i]["id"])
                 return
@@ -64,7 +66,8 @@ class RepositoryParser:
         author_obj = {
             "id": self.authorID, 
             "label": author_name,
-            "r": 1
+            "r": 1,
+            "stroke_width": 1
         }
         self.authors.append(author_obj)
         self.authorID += 1
