@@ -33,8 +33,8 @@
         .nodes(nodes)
         .links(links)
         .size([width, height])
-        .distance(100)
-        .friction(0.9)
+        .distance(150)
+        .friction(0.95)
         .charge(-1000)
         .gravity(0.05)
         .start();
@@ -55,16 +55,25 @@
     // Define data of nodes
     // id: incremental
     // label: firstname
-    // r: get times that an author has published papers
+    // r: how many times a member has published papers as a MAIN AUTHOR
+    // stroke-width: how many times a member has published papers as a CO-AUTHOR
+    var scale = 3;
+
     var node = svg.selectAll("circle")
         .data(nodes)
         .enter()
         .append("circle")
         .attr({
-            r: function(data) { return data.r * 4; }
+            r: function(data) { 
+                return (data.r + data.stroke_width/2) * scale; 
+            }
         })
         .style({
-            fill: "orange"
+            fill: "#ff6600",
+            stroke: "yellow",
+            "stroke-width": function(data){
+                return data.stroke_width * scale;
+            }
         })
         .call(force.drag);
 
