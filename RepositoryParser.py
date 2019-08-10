@@ -10,36 +10,28 @@ class RepositoryParser:
         self.main_author_id = -1
         self.co_author_id = -1
         self.isSkipMode = False
-        self.title = ""
 
-    # Get author list from HTML
-    def get_author_list(self, soup):
-        titleElem = soup.find("h1")
-        self.title = titleElem.get_text()
-        # print(self.title)
-        divElem = titleElem.parent
-        a_list = divElem.find_all("a")
+    # Scrape infomation of authors and add them into authors list
+    def add_authors_and_edges(self, _soup):
+        categoryElem = _soup.find(class_ = "type_1A0-N")
+        if categoryElem.get_text() == "学位論文":
+            return
+
+        titleElem = _soup.find("h1")
         
-        return a_list
+        author_list = titleElem.parent.find_all("a")
+        title = titleElem.get_text()
 
-    # Convert crawled full name into firstname
-    def get_firstname_from_hashmap(self, _author):
-        ret_author = None
+        self.add_author(author_list[0], True)
+        if self.isSkipMode:
+            return
 
-        if _author in MEMBERS.keys():
-            ret_author = MEMBERS[_author]
-        elif _author in MEMBERS_EN.keys():
-            ret_author = MEMBERS_EN[_author]
+        for i in range(1, len(author_list)):
+            self.add_author(author_list[i], False);
+            if self.isSkipMode:
+                return
 
-        return ret_author
-
-    # When scraping information of main author, update self.main_author_id
-    # When not doing, update self.co_author_id
-    def update_author_id(self, _is_main_author, _author_id):
-        if _is_main_author:
-            self.main_author_id = _author_id
-        else:
-            self.co_author_id = _author_id
+            self.add_edge()
 
     # Scrape information of an author add it into self.authors
     def add_author(self, _elem_author, _is_main_author):
@@ -69,33 +61,15 @@ class RepositoryParser:
             "id": self.authorID, 
             "label": author_name,
             "r": 1 if _is_main_author else 0,
-            "stroke_width": 0 if _is_main_author else 1
+            "stroke_width": 0 if _is_main_author else 1,
+            "papers": []
         }
         self.authors.append(author_obj)
         self.authorID += 1
 
-    # Scrape infomation of authors and add them into authors list
-    def add_authors_and_edges(self, _soup):
-        categoryElem = _soup.find(class_ = "type_1A0-N")
-        if categoryElem.get_text() == "学位論文":
-            return
-
-        author_list = self.get_author_list(_soup)
-
-        self.add_author(author_list[0], True)
-        if self.isSkipMode:
-            return
-
-        for i in range(1, len(author_list)):
-            self.add_author(author_list[i], False);
-            if self.isSkipMode:
-                return
-
-            self.add_edge()
-
     # Add a edge between main author and co author
     def add_edge(self):
-        print(str(self.co_author_id) +"-->"+ str(self.main_author_id))
+        print("        " + str(self.co_author_id) +"-->"+ str(self.main_author_id))
 
         for i in range(len(self.joint_works)):
             values = list(self.joint_works[i].values())
@@ -111,6 +85,27 @@ class RepositoryParser:
             "weight": 1
         }
         self.joint_works.append(joint_work)
+
+
+
+    # Convert crawled full name into firstname
+    def get_firstname_from_hashmap(self, _author):
+        ret_author = None
+
+        if _author in MEMBERS.keys():
+            ret_author = MEMBERS[_author]
+        elif _author in MEMBERS_EN.keys():
+            ret_author = MEMBERS_EN[_author]
+
+        return ret_author
+
+    # When scraping information of main author, update self.main_author_id
+    # When not doing, update self.co_author_id
+    def update_author_id(self, _is_main_author, _author_id):
+        if _is_main_author:
+            self.main_author_id = _author_id
+        else:
+            self.co_author_id = _author_id
 
     # Get result of parsing
     def getResult(self):
