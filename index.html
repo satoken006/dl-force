@@ -70,12 +70,20 @@
         })
         .style({
             fill: "#ff6600",
-            stroke: "yellow",
+            stroke: "ffd700",
             "stroke-width": function(data){
                 return data.stroke_width * scale;
             }
         })
-        .call(force.drag);
+        .call(force.drag)
+        .on({
+            "mouseenter": function(){
+                console.log("over");
+            },
+            "mouseleave": function(){
+                console.log("out");
+            }
+        });
 
     var label = svg.selectAll('text')
         .data(nodes)
@@ -84,6 +92,7 @@
         .attr({
             "text-anchor":"middle",
             "fill":"black",
+            "pointer-events": "none",
             "font-size": function(data){ return data.r * 2 + 9; }
         })
         .text(function(data) { return data.label; });

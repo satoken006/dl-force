@@ -7,15 +7,16 @@ class RepositoryParser:
         self.authors = []
         self.joint_works = []
         self.authorID = 0
-        self.main_author_id = -1;
-        self.co_author_id = -1;
+        self.main_author_id = -1
+        self.co_author_id = -1
         self.isSkipMode = False
+        self.title = ""
 
     # Get author list from HTML
     def get_author_list(self, soup):
         titleElem = soup.find("h1")
-        title = titleElem.get_text()
-        print(title)
+        self.title = titleElem.get_text()
+        # print(self.title)
         divElem = titleElem.parent
         a_list = divElem.find_all("a")
         
@@ -40,6 +41,13 @@ class RepositoryParser:
         else:
             self.co_author_id = _author_id
 
+    def print_info(self, _i, _is_main_author):
+        if self.authors[_i]["id"] == 4:
+            if _is_main_author:
+                print("Nino main " + str(self.authors[_i]["r"]) + " : " + self.title)
+            else:
+                print("Nino co " + str(self.authors[_i]["stroke_width"]) + " : " + self.title)
+
     # Scrape information of an author add it into self.authors
     def add_author(self, _elem_author, _is_main_author):
         author_name = _elem_author.get_text(" ", strip=True)
@@ -57,17 +65,23 @@ class RepositoryParser:
                     self.authors[i]["r"] += 1
                 else:
                     self.authors[i]["stroke_width"] += 1
+
+                #### fix bug ####
+                self.print_info(i, _is_main_author)
                 
                 self.update_author_id(_is_main_author, self.authors[i]["id"])
                 return
 
         self.update_author_id(_is_main_author, self.authorID)
+
         # Add a new element of author
+        # print("主著か共著かで(r=1, s=0)なのか(r=0, s=1)なのかが違う。これは_is_main_authorで決めればOK")
+
         author_obj = {
             "id": self.authorID, 
             "label": author_name,
-            "r": 1,
-            "stroke_width": 1
+            "r": 1 if _is_main_author else 0,
+            "stroke_width": 0 if _is_main_author else 1
         }
         self.authors.append(author_obj)
         self.authorID += 1
@@ -93,7 +107,7 @@ class RepositoryParser:
 
     # Add a edge between main author and co author
     def add_edge(self):
-        print(str(self.co_author_id) +"-->"+ str(self.main_author_id))
+        # print(str(self.co_author_id) +"-->"+ str(self.main_author_id))
 
         for i in range(len(self.joint_works)):
             values = list(self.joint_works[i].values())
