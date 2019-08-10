@@ -56,15 +56,23 @@
     // id: incremental
     // label: firstname
     // r: get times that an author has published papers
+    var scale = 3;
+
     var node = svg.selectAll("circle")
         .data(nodes)
         .enter()
         .append("circle")
         .attr({
-            r: function(data) { return data.r * 4; }
+            r: function(data) { 
+                return (data.r + data.stroke_width/2) * scale; 
+            }
         })
         .style({
-            fill: "orange"
+            fill: "#ff6600",
+            stroke: "yellow",
+            "stroke-width": function(data){
+                return data.stroke_width * scale;
+            }
         })
         .call(force.drag);
 
