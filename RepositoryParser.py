@@ -18,23 +18,22 @@ class RepositoryParser:
             return
 
         titleElem = _soup.find("h1")
-        
         author_list = titleElem.parent.find_all("a")
-        title = titleElem.get_text()
+        # title = titleElem.get_text()
 
-        self.add_author(author_list[0], True)
+        self.add_author(author_list[0], titleElem, True)
         if self.isSkipMode:
             return
 
         for i in range(1, len(author_list)):
-            self.add_author(author_list[i], False);
+            self.add_author(author_list[i], titleElem, False);
             if self.isSkipMode:
                 return
 
             self.add_edge()
 
     # Scrape information of an author add it into self.authors
-    def add_author(self, _elem_author, _is_main_author):
+    def add_author(self, _elem_author, _elem_title, _is_main_author):
         author_name = _elem_author.get_text(" ", strip=True)
         author_name = self.get_firstname_from_hashmap(author_name)
         author_id = -1;
