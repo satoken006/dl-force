@@ -15,11 +15,14 @@
     var width = 1000;
     var height = 1000;
 
+    var nodes = [];
+    var links = [];
+
     // setup svg
     var svg = d3.select("body")
         .append("svg")
         .attr({width:width, height:height});
-    
+
     $.ajaxSetup({async: false});
     $.getJSON("output.json", function (data) {
         nodes = data["nodes"];
