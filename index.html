@@ -50,6 +50,16 @@
         .style({
             stroke: function(data){ return "rgb(" + (data.weight - 1) * 64 + ", 0, 255)"; },
             "stroke-width": function(data){ return data.weight * 2; }
+        }).on({
+            "click": function(data){
+                console.log( data.source.label + "さんと" + data.target.label + "さんが一緒にPublishした業績は...");
+                data.papers.forEach(function(value){
+                    console.log(value.date + ": " + value.title);
+                });
+                console.log("\n");
+            },
+            "mouseleave": function(data){
+            }
         });
 
     // Define data of nodes
@@ -78,10 +88,10 @@
         .call(force.drag)
         .on({
             "mouseenter": function(){
-                console.log("over");
+                // console.log("over");
             },
             "mouseleave": function(){
-                console.log("out");
+                // console.log("out");
             }
         });
 
