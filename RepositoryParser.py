@@ -30,7 +30,7 @@ class RepositoryParser:
             if self.isSkipMode:
                 return
 
-            self.add_edge()
+            self.add_edge(titleElem)
 
     # Scrape information of an author add it into self.authors
     def add_author(self, _elem_author, _elem_title, _is_main_author):
@@ -60,28 +60,34 @@ class RepositoryParser:
             "id": self.authorID, 
             "label": author_name,
             "r": 1 if _is_main_author else 0,
-            "stroke_width": 0 if _is_main_author else 1,
-            "papers": []
+            "stroke_width": 0 if _is_main_author else 1
         }
         self.authors.append(author_obj)
         self.authorID += 1
 
     # Add a edge between main author and co author
-    def add_edge(self):
+    def add_edge(self, _titleElem):
         print("        " + str(self.co_author_id) +"-->"+ str(self.main_author_id))
+        title = _titleElem.get_text()
 
         for i in range(len(self.joint_works)):
             values = list(self.joint_works[i].values())
 
             if (self.main_author_id == values[0] and self.co_author_id == values[1]) or (self.main_author_id == values[1] and self.co_author_id == values[0]):
                 self.joint_works[i]["weight"] += 1
+                self.joint_works[i]["papers"].append({"title": title})
                 return
 
         # Add a new element of edge
         joint_work = {
             "source": self.co_author_id,
             "target": self.main_author_id,
-            "weight": 1
+            "weight": 1,
+            "papers": [
+                {
+                    "title": title
+                }
+            ]
         }
         self.joint_works.append(joint_work)
 
