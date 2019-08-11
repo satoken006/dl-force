@@ -85,6 +85,14 @@ class RepositoryParser:
 
             if (self.main_author_id == values[0] and self.co_author_id == values[1]) or (self.main_author_id == values[1] and self.co_author_id == values[0]):
                 self.joint_works[i]["weight"] += 1
+                for j in range(len(self.joint_works[i]["papers"])):
+                    if date < self.joint_works[i]["papers"][j]["date"]:
+                        self.joint_works[i]["papers"].insert(j, {
+                            "date": date,
+                            "title": title
+                        })
+                        return
+
                 self.joint_works[i]["papers"].append({
                     "date": date,
                     "title": title

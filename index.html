@@ -4,12 +4,10 @@
     <title>d3test</title>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
 <body>
-
-<style type="text/css">
-</style>
 
 <script type="text/javascript">
     var width = 1000;
@@ -21,7 +19,8 @@
     // setup svg
     var svg = d3.select("body")
         .append("svg")
-        .attr({width:width, height:height});
+        .attr({width:width, height:height})
+        .style({"background-color": "white"});
 
     $.ajaxSetup({async: false});
     $.getJSON("output.json", function (data) {
