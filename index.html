@@ -4,22 +4,24 @@
     <title>d3test</title>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
 <body>
-
-<style type="text/css">
-</style>
 
 <script type="text/javascript">
     var width = 1000;
     var height = 1000;
 
+    var nodes = [];
+    var links = [];
+
     // setup svg
     var svg = d3.select("body")
         .append("svg")
-        .attr({width:width, height:height});
-    
+        .attr({width:width, height:height})
+        .style({"background-color": "white"});
+
     $.ajaxSetup({async: false});
     $.getJSON("output.json", function (data) {
         nodes = data["nodes"];
@@ -30,8 +32,8 @@
         .nodes(nodes)
         .links(links)
         .size([width, height])
-        .distance(100)
-        .friction(0.9)
+        .distance(150)
+        .friction(0.95)
         .charge(-1000)
         .gravity(0.05)
         .start();
@@ -47,23 +49,50 @@
         .style({
             stroke: function(data){ return "rgb(" + (data.weight - 1) * 64 + ", 0, 255)"; },
             "stroke-width": function(data){ return data.weight * 2; }
+        }).on({
+            "click": function(data){
+                console.log( data.source.label + "さんと" + data.target.label + "さんが一緒にPublishした業績は...");
+                data.papers.forEach(function(value){
+                    console.log(value.date + ": " + value.title);
+                });
+                console.log("\n");
+            },
+            "mouseleave": function(data){
+            }
         });
 
     // Define data of nodes
     // id: incremental
     // label: firstname
-    // r: get times that an author has published papers
+    // r: how many times a member has published papers as a MAIN AUTHOR
+    // stroke-width: how many times a member has published papers as a CO-AUTHOR
+    var scale = 3;
+
     var node = svg.selectAll("circle")
         .data(nodes)
         .enter()
         .append("circle")
         .attr({
-            r: function(data) { return data.r * 4; }
+            r: function(data) { 
+                return (data.r + data.stroke_width/2) * scale; 
+            }
         })
         .style({
-            fill: "orange"
+            fill: "#ff6600",
+            stroke: "ffd700",
+            "stroke-width": function(data){
+                return data.stroke_width * scale;
+            }
         })
-        .call(force.drag);
+        .call(force.drag)
+        .on({
+            "mouseenter": function(){
+                // console.log("over");
+            },
+            "mouseleave": function(){
+                // console.log("out");
+            }
+        });
 
     var label = svg.selectAll('text')
         .data(nodes)
@@ -72,6 +101,7 @@
         .attr({
             "text-anchor":"middle",
             "fill":"black",
+            "pointer-events": "none",
             "font-size": function(data){ return data.r * 2 + 9; }
         })
         .text(function(data) { return data.label; });

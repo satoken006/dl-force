@@ -11,7 +11,7 @@ parser = RepositoryParser()
 writer = JSONWriter()
 RANGE = 194
 ### For test run ###
-# RANGE = 50
+# RANGE = 30
 
 for i in range(1, RANGE + 1):
     # Connect to the Web and get HTML
