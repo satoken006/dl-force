@@ -17,6 +17,7 @@ class RepositoryParser:
         if categoryElem.get_text() == "学位論文":
             return
 
+        date_elems = _soup.find_all(class_ = "halfwidth_1OaB1")
         titleElem = _soup.find("h1")
         author_list = titleElem.parent.find_all("a")
         # title = titleElem.get_text()
@@ -30,7 +31,7 @@ class RepositoryParser:
             if self.isSkipMode:
                 return
 
-            self.add_edge(titleElem)
+            self.add_edge(date_elems, titleElem)
 
     # Scrape information of an author add it into self.authors
     def add_author(self, _elem_author, _elem_title, _is_main_author):
@@ -66,16 +67,28 @@ class RepositoryParser:
         self.authorID += 1
 
     # Add a edge between main author and co author
-    def add_edge(self, _titleElem):
-        print("        " + str(self.co_author_id) +"-->"+ str(self.main_author_id))
+    def add_edge(self, _date_elems, _titleElem):
+        print("        " + str(self.co_author_id) + "-->" + str(self.main_author_id))
         title = _titleElem.get_text()
+        date = ""
+
+        for date_elem in _date_elems:
+            p_elems = date_elem.find_all("p")
+            if p_elems[0].get_text() == "Date of issue":
+                date = p_elems[1].get_text()
+                # print("日付を検出: " + date)
+                break
+
 
         for i in range(len(self.joint_works)):
             values = list(self.joint_works[i].values())
 
             if (self.main_author_id == values[0] and self.co_author_id == values[1]) or (self.main_author_id == values[1] and self.co_author_id == values[0]):
                 self.joint_works[i]["weight"] += 1
-                self.joint_works[i]["papers"].append({"title": title})
+                self.joint_works[i]["papers"].append({
+                    "date": date,
+                    "title": title
+                })
                 return
 
         # Add a new element of edge
@@ -85,6 +98,7 @@ class RepositoryParser:
             "weight": 1,
             "papers": [
                 {
+                    "date": date,
                     "title": title
                 }
             ]

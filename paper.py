@@ -9,9 +9,9 @@ from JSONWriter import JSONWriter
 
 parser = RepositoryParser()
 writer = JSONWriter()
-RANGE = 194
+# RANGE = 194
 ### For test run ###
-# RANGE = 91
+RANGE = 30
 
 for i in range(1, RANGE + 1):
     # Connect to the Web and get HTML
